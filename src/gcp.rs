@@ -4,16 +4,19 @@
 use crate::{error::Error, jwt};
 
 mod end_user;
+mod impersonate;
 mod metadata_server;
 mod service_account;
 
 use end_user as eu;
+use impersonate as im;
 use metadata_server as ms;
 use service_account as sa;
 
 pub use crate::token::{Token, TokenOrRequest, TokenProvider};
 pub use {
     eu::EndUserCredentials,
+    im::{ImpersonatedAccountInfo, ImpersonatedAccountProvider},
     ms::MetadataServerProvider,
     sa::{ServiceAccountInfo, ServiceAccountProvider},
 };

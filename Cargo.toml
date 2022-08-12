@@ -27,7 +27,7 @@ path = "src/lib.rs"
 # other oauth providers this will most likely change to not have any default features
 default = ["gcp"]
 # Supports for GCP oauth2
-gcp = ["jwt", "url"]
+gcp = ["jwt", "time", "url"]
 # Support for Json Web Tokens, ring is used for signing
 jwt = ["ring"]
 # This enables features in chrono and ring that are necessary to use this library
@@ -42,6 +42,7 @@ http = "0.2"
 ring = { version = "0.16", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+time = { version = "0.3.13", optional = true, features = ["parsing"] }
 twox-hash = { version = "1.5.0", default-features = false }
 url = { version = "2.2", optional = true }
 

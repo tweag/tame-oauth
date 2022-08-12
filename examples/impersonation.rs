@@ -41,12 +41,10 @@ async fn make_request(request: http::Request<Vec<u8>>) -> http::Response<String>
     builder.body(buffer).unwrap()
 }
 
-// This example shows the basics for creating a token provider for the default
-// credentials on the system. If you want to use a service account, set
-// `GOOGLE_APPLICATION_CREDENTIALS` to a service account key path, if have
-// gcloud installed, you can just run this as is and it will work as long as
-// you have done `gcloud auth application-default login` previously, and that
-// token hasn't expired
+// This example impersonates a service account by getting the default user
+// credentials (which should work as long as you have done
+// `gcloud auth application-default login` recently) and then using that user
+// to impersonate the service email given as the first command line parameter.
 #[tokio::main]
 async fn main() {
     let svc_email = std::env::args().skip(1).next().unwrap();
@@ -56,7 +54,10 @@ async fn main() {
         .expect("unable to read default token provider")
         .expect("unable to find default token provider");
 
-    println!("Using {}", provider.kind());
+    if provider.kind() != "End User" {
+        println!("Didn't get user credentials: got {}", provider.kind());
+        return;
+    }
 
     // Attempt to get a token, since we have never used this accessor
     // before, it's guaranteed that we will need to make an HTTPS
@@ -78,7 +79,7 @@ async fn main() {
                 .parse_token_response(scope_hash, response)
                 .expect("invalid token response");
 
-            println!("cool, we were able to receive a token!");
+            println!("Got an end user token!");
 
             // Now, use this token to impersonate a service account.
             let info = ImpersonatedAccountInfo {
@@ -100,6 +101,7 @@ async fn main() {
                     let tok = im
                         .parse_token_response(scope_hash, response)
                         .expect("invalid im response");
+                    println!("we were able to impersonate the requested service!");
                     dbg!(tok);
                 }
                 _ => unreachable!(),
